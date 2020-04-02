@@ -1,10 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-	<form method="POST">
-		{{ form.hidden_tag() }}		
-		{{ form.email.label}} {{form.email()}}<br>
-		{{ form.password.label }} {{form.password() }}<br>
-		{{ form.validate_error.label(validate_error) }}<br>
-		{{ form.submit() }}
-	</form>
+	<div class="login-form">
+    <form method="POST">
+    	{{ form.hidden_tag() }}	
+        {% if url_for(request.endpoint) == "/admin_login" %}
+        	<h2 class="text-center">Admin Log In</h2> 
+        {% else %}
+            <h2 class="text-center">Log In</h2> 
+            <div class="social-login">
+              
+              <a href="{{ url_for('github_login') }}" class="pull-right btn facebook-btn social-btn">Log In with Github</a>
+                
+            </div>   
+        {% endif %}
+        <div class="form-group">
+        	 {{ form.email.label}} {{form.email(type="email", class="form-control", placeholder="Email id", required="required")}}
+           
+        </div>
+        <div class="form-group">
+        	{{ form.password.label }} {{form.password(type="password", class="form-control", placeholder="Password", required="required") }}
+           {{ form.validate_error.label(validate_error, id="validation_msg") }}
+        </div>
+        <div class="form-group">
+        	{{ form.submit(type="submit", class="btn btn-primary btn-block") }}
+        </div>
+        <div class="clearfix">
+            {{ form.remember_me(class="pull-left checkbox-inline", type="checkbox") }} {{ form.remember_me.label }} 
+           <!--  <label class="pull-left checkbox-inline"><input type="checkbox"> Remember me</label> -->
+            <a href="{{ url_for('forgot_password1') }}" class="pull-right">Forgot Password?</a>
+        </div>        
+    </form>
+    {% if url_for(request.endpoint) == "/login" %}
+    <p class="text-center"><a href="{{ url_for('register') }}">Create an Account</a></p>
+    {% endif %}
+</div>    
+        
 {% endblock %}

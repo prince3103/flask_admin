@@ -1,9 +1,12 @@
 import os
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
-
+from flask_mail import Mail
+from itsdangerous import URLSafeTimedSerializer
+from flask_dance.contrib.github import make_github_blueprint
 
 secret_key = os.urandom(32)
 file_path = os.path.abspath(os.path.dirname(__file__))
@@ -21,3 +24,14 @@ login_manager.login_view = "login"
 
 # set optional bootswatch theme
 app.config['FLASK_ADMIN_SWATCH'] = 'cerulean'
+
+#---for flask-mail functionlity------
+app.config.from_pyfile('config.cfg')
+mail = Mail(app)
+url_safe_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+#-------for flask oauth functionality----------------
+github_blueprint = make_github_blueprint(
+    client_id="777442adcfc656de0134",
+    client_secret="3d425e90bc9015bf55bab29987226148f85159d1",
+)

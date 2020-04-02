@@ -1,0 +1,84 @@
+.login-form {
+        width: 340px;
+        margin: 50px auto;
+}
+.login-form form {
+    margin-bottom: 15px;
+    background: #f7f7f7;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+}
+.login-form h2 {
+    margin: 0 0 15px;
+}
+
+.social-login{
+    width:390px;
+    margin:0 auto;
+    margin-bottom: 14px;
+}
+
+.social-btn{
+    font-weight: 100;
+    color:white;
+    width:190px;
+    font-size: 0.9rem;
+}
+
+.facebook-btn{  background-color:#3C589C; }
+
+
+.form-control, .btn {
+    min-height: 38px;
+    border-radius: 2px;
+}
+.btn {        
+    font-size: 15px;
+    font-weight: bold;
+}
+#validation_msg{
+    font-size: 13px;
+    color: red;
+}
+
+.register-form {
+        width: 340px;
+        margin: 0px auto;
+}
+.register-form form {
+    margin-bottom: 15px;
+    background: #f7f7f7;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+.register-form h2 {
+    margin: 0 0 15px;
+}
+
+.forgot-password1-form {
+        width: 340px;
+        margin: 0px auto;
+}
+.forgot-password1-form form {
+    margin-bottom: 15px;
+    background: #f7f7f7;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+.forgot-password1-form h2 {
+    margin: 0 0 15px;
+}
+
+.forgot-password2-form {
+        width: 340px;
+        margin: 0px auto;
+}
+.forgot-password2-form form {
+    margin-bottom: 15px;
+    background: #f7f7f7;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+}
+.forgot-password2-form h2 {
+    margin: 0 0 15px;
+}
