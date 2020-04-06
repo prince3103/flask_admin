@@ -173,11 +173,11 @@ def register():
 			validate_error = "Your email has been registered already!"
 		else:
 			#email confirmation code-----------------------
-			token = url_safe_serializer.dumps(email, salt='email-confirm')
-			msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
-			link = url_for('confirm_email', token=token, _external=True)
-			msg.body = 'Click link to confirm: {}'.format(link)
-			mail.send(msg)
+			# token = url_safe_serializer.dumps(email, salt='email-confirm')
+			# msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
+			# link = url_for('confirm_email', token=token, _external=True)
+			# msg.body = 'Click link to confirm: {}'.format(link)
+			# mail.send(msg)
 			#unconfirmed user added to database
 			user = User(username, email, password)
 			try:
