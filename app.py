@@ -116,26 +116,26 @@ def login():
 			remember_me = "False"
 		user = User.query.filter_by(email=email).first()
 		if user:
-			if user.confirm:
-				password = check_password_hash(user.password, request.form['password'])	
+			# if user.confirm:
+			password = check_password_hash(user.password, request.form['password'])	
 
-				if password:
-					if remember_me:
-						login_user(user, remember=True)
-					else:
-						login_user(user, remember=False)
-					flash('Logged in successfully.')
-					next = request.args.get('next')
-					#is_safe_url should check if the url is safe for redirects.
-					#See http://flask.pocoo.org/snippets/62/ for an example.
-					if next and not is_safe_url(next, {"example.com", "www.example.com"}):	#do I need to change this to heroku url
-						return abort(400)
+			if password:
+				if remember_me:
+					login_user(user, remember=True)
+				else:
+					login_user(user, remember=False)
+				flash('Logged in successfully.')
+				next = request.args.get('next')
+				#is_safe_url should check if the url is safe for redirects.
+				#See http://flask.pocoo.org/snippets/62/ for an example.
+				if next and not is_safe_url(next, {"example.com", "www.example.com"}):	#do I need to change this to heroku url
+					return abort(400)
 
-					return redirect(next or url_for('home'))
-				else: 
-					validate_error="Please click on the link provided in confirmation email sent to your email address and then Sign In"
-			else:
-				validate_error="Please confirm your email from the link povided in the mail sent to your email address"
+				return redirect(next or url_for('home'))
+			else: 
+				validate_error="Invalid email address or password"
+			# else:
+			# 	validate_error="Please confirm your email from the link povided in the mail sent to your email address"
 		else:
 			validate_error="Invalid email address or password"
 	elif request.method == 'POST':
@@ -173,11 +173,11 @@ def register():
 			validate_error = "Your email has been registered already!"
 		else:
 			#email confirmation code-----------------------
-			token = url_safe_serializer.dumps(email, salt='email-confirm')
-			msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
-			link = url_for('confirm_email', token=token, _external=True)
-			msg.body = 'Click link to confirm: {}'.format(link)
-			mail.send(msg)
+			# token = url_safe_serializer.dumps(email, salt='email-confirm')
+			# msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
+			# link = url_for('confirm_email', token=token, _external=True)
+			# msg.body = 'Click link to confirm: {}'.format(link)
+			# mail.send(msg)
 			#unconfirmed user added to database
 			user = User(username, email, password)
 			try:
