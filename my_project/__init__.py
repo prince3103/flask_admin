@@ -1,5 +1,5 @@
-import os
-# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+import os, stripe
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_mail import Mail
 from itsdangerous import URLSafeTimedSerializer
 from flask_dance.contrib.github import make_github_blueprint
+
 
 secret_key = os.urandom(32)
 file_path = os.path.abspath(os.path.dirname(__file__))
@@ -35,3 +36,7 @@ github_blueprint = make_github_blueprint(
     client_id="777442adcfc656de0134",
     client_secret="3d425e90bc9015bf55bab29987226148f85159d1",
 )
+
+#----Stripe for payment-------------
+public_key = 'pk_test_6pRNASCoBOKtIshFeQd4XMUh'
+stripe.api_key = "sk_test_BQokikJOvBiI2HlWgH4olfQ2"

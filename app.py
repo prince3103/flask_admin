@@ -1,8 +1,11 @@
 from flask import render_template, url_for, redirect, request, flash, abort
-from my_project.forms import LoginForm, RegisterForm, ForgotPassword1, ForgotPassword2
-from my_project import app, db, url_safe_serializer, mail, github_blueprint
-from my_project.models import User, MyModelView, MyAdminIndexView, LogoutMenuLink
-from flask_login import login_user, logout_user, login_required
+from my_project.forms import (LoginForm, RegisterForm,
+ ForgotPassword1, ForgotPassword2)
+from my_project import (app, db, url_safe_serializer,
+ mail, github_blueprint, public_key, stripe)
+from my_project.models import (User, MyModelView,
+ MyAdminIndexView, LogoutMenuLink)
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from is_safe_url import is_safe_url
 from flask_admin import Admin
@@ -50,17 +53,48 @@ def github_login():
 		if next and not is_safe_url(next, {"example.com", "www.example.com"}):	#do I need to change this to heroku url
 			return abort(400)
 
-		return redirect(next or url_for('home'))
+		return redirect(url_for('home'))
 	return "<h1>Request Failed</h1>"
 
 
-@app.route("/")
+# @app.route("/")
+# @login_required
+# def home():
+# 	return render_template('home.html')
+
+@app.route('/')
 @login_required
 def home():
-	return render_template('home.html')
+    return render_template('index.html', public_key=public_key)
+
+@app.route('/thankyou')
+@login_required
+def thankyou():
+    return render_template('thankyou.html')
+
+@app.route('/payment', methods=['POST'])
+@login_required
+def payment():
+
+    # CUSTOMER INFORMATION
+    customer = stripe.Customer.create(email=request.form['stripeEmail'],
+                                      source=request.form['stripeToken'])
+
+    # CHARGE/PAYMENT INFORMATION
+    charge = stripe.Charge.create(
+        customer=customer.id,
+        amount=1999,
+        currency='usd',
+        description='Donation'
+    )
+    print(customer)
+    print(charge)
+    return redirect(url_for('thankyou'))
 
 @app.route('/admin_login', methods=('GET', 'POST'))
 def admin_login():
+	if current_user.is_authenticated:
+		return redirect(url_for('admin_logout'))
 	form = LoginForm()
 	validate_error="Fields marked with * are mandatory"
 	if form.validate_on_submit():
@@ -96,13 +130,16 @@ def admin_login():
 @app.route("/admin_logout")
 @login_required
 def admin_logout():
-    logout_user()
-    flash('You logged out!')
-    return redirect(url_for('admin_login'))
+	print("admin_logout")
+	logout_user()
+	flash('You logged out!')
+	return redirect(url_for('admin_login'))
 
 
 @app.route('/login', methods=('GET', 'POST'))
 def login():
+	if current_user.is_authenticated:
+		return redirect(url_for('logout'))
 	form = LoginForm()
 	
 	validate_error="Fields marked with * are mandatory"
@@ -116,26 +153,26 @@ def login():
 			remember_me = "False"
 		user = User.query.filter_by(email=email).first()
 		if user:
-			# if user.confirm:
-			password = check_password_hash(user.password, request.form['password'])	
+			if user.confirm:
+				password = check_password_hash(user.password, request.form['password'])	
 
-			if password:
-				if remember_me:
-					login_user(user, remember=True)
-				else:
-					login_user(user, remember=False)
-				flash('Logged in successfully.')
-				next = request.args.get('next')
-				#is_safe_url should check if the url is safe for redirects.
-				#See http://flask.pocoo.org/snippets/62/ for an example.
-				if next and not is_safe_url(next, {"example.com", "www.example.com"}):	#do I need to change this to heroku url
-					return abort(400)
+				if password:
+					if remember_me:
+						login_user(user, remember=True)
+					else:
+						login_user(user, remember=False)
+					flash('Logged in successfully.')
+					next = request.args.get('next')
+					#is_safe_url should check if the url is safe for redirects.
+					#See http://flask.pocoo.org/snippets/62/ for an example.
+					if next and not is_safe_url(next, {"example.com", "www.example.com"}):	#do I need to change this to heroku url
+						return abort(400)
 
-				return redirect(next or url_for('home'))
-			else: 
-				validate_error="Invalid email address or password"
-			# else:
-			# 	validate_error="Please confirm your email from the link povided in the mail sent to your email address"
+					return redirect(next or url_for('home'))
+				else: 
+					validate_error="Invalid email address or password"
+			else:
+				validate_error="Please confirm your email from the link povided in the mail sent to your email address"
 		else:
 			validate_error="Invalid email address or password"
 	elif request.method == 'POST':
@@ -149,9 +186,10 @@ def login():
 @app.route("/logout")
 @login_required
 def logout():
-    logout_user()
-    flash('You logged out!')
-    return redirect(url_for('login'))
+	print("user_logout")
+	logout_user()
+	flash('You logged out!')
+	return redirect(url_for('login'))
 
 
 @app.route('/register', methods=('GET', 'POST'))
@@ -173,11 +211,11 @@ def register():
 			validate_error = "Your email has been registered already!"
 		else:
 			#email confirmation code-----------------------
-			# token = url_safe_serializer.dumps(email, salt='email-confirm')
-			# msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
-			# link = url_for('confirm_email', token=token, _external=True)
-			# msg.body = 'Click link to confirm: {}'.format(link)
-			# mail.send(msg)
+			token = url_safe_serializer.dumps(email, salt='email-confirm')
+			msg = Message('Confirm Email', sender=app.config.get("MAIL_USERNAME"), recipients=[email])
+			link = url_for('confirm_email', token=token, _external=True)
+			msg.body = 'Click link to confirm: {}'.format(link)
+			mail.send(msg)
 			#unconfirmed user added to database
 			user = User(username, email, password)
 			try:
