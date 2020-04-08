@@ -29,18 +29,17 @@ def github_login():
 	account_info = github.get('/user')
 	if account_info.ok:
 		account_info_json = account_info.json()
-		username = "github_"+account_info_json['login']
+		username = account_info_json['login']
 		email = "thirdparty@github.com"
 		password = "thirdparty"
 
 		check_username = User.checkUsername(username)
+		username = "github_"+account_info_json['login']
 		if check_username:
 			user = User(username, email, password)
 			try:
 				db.session.add(user)
-				db.session.commit()
-
-				
+				db.session.commit()	
 			except:
 				return "<h1>Request Failed</h1>"
 		else:
