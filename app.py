@@ -294,5 +294,8 @@ def forgot_password2(token):
 
 if __name__== '__main__':
 	# db.create_all()
+	@app.before_first_request
+	def create_tables():
+		db.create_all()
 	app.run(port = 8080, debug=True)
 
