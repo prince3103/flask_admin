@@ -16,9 +16,9 @@ app.config['SECRET_KEY'] = secret_key
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
-login_manager = LoginManager()
+login_manager = LoginManager()	
 login_manager.init_app(app)
 # Tell users what view to go to when they need to login.
 login_manager.login_view = "login"
